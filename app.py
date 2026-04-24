@@ -50,6 +50,17 @@ OUTPUT_FOLDER = Path("/tmp/llm_pipeline_output")
 for folder in [UPLOAD_FOLDER, EXTRACT_FOLDER, OUTPUT_FOLDER]:
     folder.mkdir(parents=True, exist_ok=True)
 
+# Check system dependencies
+def check_system_dependencies():
+    """Check that required system tools are available."""
+    missing = []
+    for cmd, name in [('pandoc', 'pandoc'), ('tesseract', 'Tesseract OCR'), ('pdftotext', 'poppler-utils')]:
+        try:
+            subprocess.run(['which', cmd], capture_output=True, check=True)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            missing.append(f'{name} ({cmd})')
+    return missing
+
 # ============================================================================
 # File Type Definitions
 # ============================================================================
@@ -166,7 +177,7 @@ def handle_tier_s(input_path: Path, output_path: Path, rel_path: Path,
         shutil.copy2(input_path, output_path)
         manifest_log.append({
             'original': str(rel_path),
-            'output': str(output_path.relative_to(output_path.parent.parent)),
+            'output': str(rel_path),
             'action': 'Copied as-is (Tier S)',
             'status': 'success'
         })
@@ -205,6 +216,8 @@ def handle_tier_a(input_path: Path, output_path: Path, rel_path: Path,
             timeout=30
         )
 
+        output_rel_path = rel_path.with_suffix('.md')
+
         if result.returncode == 0 and output_path.exists():
             # If output is empty, try alternative approach
             if output_path.stat().st_size == 0:
@@ -214,7 +227,7 @@ def handle_tier_a(input_path: Path, output_path: Path, rel_path: Path,
                     if success:
                         manifest_log.append({
                             'original': str(rel_path),
-                            'output': str(output_path.relative_to(output_path.parent.parent)),
+                            'output': str(output_rel_path),
                             'action': 'Converted to Markdown (Tier A - Python fallback)',
                             'status': 'success'
                         })
@@ -229,7 +242,7 @@ def handle_tier_a(input_path: Path, output_path: Path, rel_path: Path,
 
             manifest_log.append({
                 'original': str(rel_path),
-                'output': str(output_path.relative_to(output_path.parent.parent)),
+                'output': str(output_rel_path),
                 'action': 'Converted to Markdown (Tier A)',
                 'status': 'success'
             })
@@ -242,7 +255,7 @@ def handle_tier_a(input_path: Path, output_path: Path, rel_path: Path,
             if success:
                 manifest_log.append({
                     'original': str(rel_path),
-                    'output': str(output_path.relative_to(output_path.parent.parent)),
+                    'output': str(output_rel_path),
                     'action': 'Converted to Markdown (Tier A - Python fallback)',
                     'status': 'success'
                 })
@@ -384,9 +397,10 @@ def handle_tier_c(input_path: Path, output_path: Path, rel_path: Path,
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(text_content)
 
+        output_rel_path = rel_path.with_suffix(rel_path.suffix + '.txt')
         manifest_log.append({
             'original': str(rel_path),
-            'output': str(output_path.relative_to(output_path.parent.parent)),
+            'output': str(output_rel_path),
             'action': 'Text extracted via OCR (Tier C)',
             'status': 'success'
         })
@@ -523,7 +537,7 @@ def generate_manifest(manifest_path: Path, original_zip: str, output_dir: Path,
     lines.append(f"**Original ZIP:** `{original_zip}`\n")
     lines.append(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     lines.append(f"**Total Files Processed:** {total_files}\n")
-    lines.append(f"**Total Output Files:** {sum(1 for _, _, status in [(entry['status']) for entry in manifest_log if entry['status'] in ('success', 'skipped')])}\n")
+    lines.append(f"**Total Output Files:** {sum(1 for entry in manifest_log if entry['status'] in ('success', 'skipped'))}\n")
     lines.append("---\n\n")
 
     lines.append("## File Tree\n\n")
@@ -821,7 +835,32 @@ HTML_TEMPLATE = """
         const progressFill = document.getElementById('progressFill');
         const statusMessage = document.getElementById('statusMessage');
 
-        let selectedFile = null;
+         let selectedFile = null;
+        let depsChecked = false;
+
+        // Check dependencies on load
+        checkDependencies();
+
+        function checkDependencies() {
+            fetch('/check-deps')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status !== 'ok') {
+                        showStatus(
+                            'Missing dependencies: ' + data.missing.join(', ') + 
+                            '. ' + data.install_cmd,
+                            'error'
+                        );
+                        uploadBtn.disabled = true;
+                    }
+                    depsChecked = true;
+                })
+                .catch(() => {
+                    showStatus('Could not check dependencies', 'error');
+                    depsChecked = true;
+                });
+        }
+
 
         // Click to select
         dropZone.addEventListener('click', () => fileInput.click());
@@ -958,6 +997,18 @@ def index():
     """Serve the main page."""
     return render_template_string(HTML_TEMPLATE)
 
+@app.route('/check-deps')
+def check_deps():
+    """Check if all system dependencies are installed."""
+    missing = check_system_dependencies()
+    if missing:
+        return jsonify({
+            'status': 'missing',
+            'missing': missing,
+            'install_cmd': 'sudo apt-get install -y pandoc tesseract-ocr poppler-utils'
+        })
+    return jsonify({'status': 'ok', 'missing': []})
+
 @app.route('/process', methods=['POST'])
 def process():
     """Handle ZIP file upload and processing."""
@@ -971,7 +1022,28 @@ def process():
     if not file.filename.lower().endswith('.zip'):
         return jsonify({'error': 'File must be a ZIP archive'}), 400
 
+    # Check system dependencies
+    missing_deps = check_system_dependencies()
+    if missing_deps:
+        return jsonify({
+            'error': 'Missing system dependencies',
+            'details': 'Required tools not found: ' + ', '.join(missing_deps),
+            'install': 'Run: sudo apt-get install -y pandoc tesseract-ocr poppler-utils'
+        }), 503
+
     try:
+        # Check file size (soft limit: 500MB)
+        file.seek(0, 2)  # Seek to end
+        file_size = file.tell()
+        file.seek(0)  # Seek back to start
+        
+        if file_size > 500 * 1024 * 1024:
+            return jsonify({
+                'error': 'File too large',
+                'max_size': '500MB',
+                'actual_size': f'{file_size / (1024*1024):.2f}MB'
+            }), 413
+
         # Save uploaded file
         upload_path = UPLOAD_FOLDER / file.filename
         file.save(upload_path)

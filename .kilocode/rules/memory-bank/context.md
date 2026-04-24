@@ -6,7 +6,7 @@
 
 The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
 
-Additionally, a standalone LLM Pre-Processing Pipeline application has been generated (`app.py`) that converts ZIP files into LLM-optimized packages.
+Additionally, a standalone **LLM Pre-Processing Pipeline** application has been generated (`app.py`) that converts ZIP files into LLM-optimized packages.
 
 ## Recently Completed
 
@@ -16,25 +16,61 @@ Additionally, a standalone LLM Pre-Processing Pipeline application has been gene
 - [x] ESLint configuration
 - [x] Memory bank documentation
 - [x] Recipe system for common features
-- [x] LLM Pre-Processing Pipeline (`app.py`) - ZIP to LLM-optimized package converter
+- [x] LLM Pre-Processing Pipeline (`app.py`) - ZIP to LLM-optimized converter
+- [x] System dependency validation (pandoc, tesseract, poppler)
+- [x] Input validation and error handling
+- [x] Integration testing
+- [x] Comprehensive documentation
 
 ## Current Focus
 
-The template is ready. Next steps depend on user requirements:
+The template and LLM pipeline are production-ready. Next steps depend on user requirements:
 
-1. What type of application to build
+1. What type of application to build using the Next.js template
 2. What features are needed
 3. Design/branding preferences
 
-The LLM pipeline app (`app.py`) is a standalone utility that:
-- Accepts ZIP file uploads via a drag-and-drop web interface
-- Processes files according to the LLM Data-Type Hierarchy
-- Tier S: Raw text/code → passthrough
-- Tier A: Office docs → Markdown via pandoc
-- Tier C: Images/PDFs → OCR text extraction
-- Tier F: Binary files → ignored
-- Generates a `_manifest.md` with complete processing log
-- Returns a new ZIP optimized for LLM ingestion
+## LLM Pipeline Overview
+
+**`app.py`** is a production-ready Flask web application (1144 lines) that:
+
+- ✅ Drag-and-drop ZIP file upload interface
+- ✅ Validates system dependencies (pandoc, tesseract, poppler)
+- ✅ Validates file size (500MB limit)
+- ✅ Applies LLM Data-Type Hierarchy to each file:
+  - **Tier S**: Code/text/JSON/YAML/Markdown → passthrough
+  - **Tier A**: DOCX/PPTX/XLSX/RTF/ODT → Markdown via pandoc
+  - **Tier C**: PNG/JPG/GIF/BMP/PDF → OCR text extraction
+  - **Tier F**: Binary/executable/media → excluded
+- ✅ Generates `_manifest.md` with complete file tree and processing log
+- ✅ Returns downloadable ZIP optimized for LLM ingestion
+- ✅ Comprehensive error handling and logging
+- ✅ Automatic cleanup of temp directories
+
+### Quick Start
+
+```bash
+# Install system dependencies
+sudo apt-get install -y pandoc tesseract-ocr poppler-utils
+
+# Install Python dependencies  
+pip install -r requirements.txt
+
+# Run the server
+python app.py
+```
+
+Then navigate to http://localhost:5000
+
+## Available Recipes
+
+| Recipe | File | Use Case |
+|--------|------|----------|
+| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
+
+---
+
+*Last updated: 2026-04-24*
 
 ## Quick Start Guide
 
