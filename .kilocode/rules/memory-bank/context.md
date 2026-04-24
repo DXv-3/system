@@ -6,6 +6,8 @@
 
 The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
 
+Additionally, a standalone LLM Pre-Processing Pipeline application has been generated (`app.py`) that converts ZIP files into LLM-optimized packages.
+
 ## Recently Completed
 
 - [x] Base Next.js 16 setup with App Router
@@ -14,15 +16,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] ESLint configuration
 - [x] Memory bank documentation
 - [x] Recipe system for common features
-
-## Current Structure
-
-| File/Directory | Purpose | Status |
-|----------------|---------|--------|
-| `src/app/page.tsx` | Home page | ✅ Ready |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles | ✅ Ready |
-| `.kilocode/` | AI context & recipes | ✅ Ready |
+- [x] LLM Pre-Processing Pipeline (`app.py`) - ZIP to LLM-optimized package converter
 
 ## Current Focus
 
@@ -31,6 +25,16 @@ The template is ready. Next steps depend on user requirements:
 1. What type of application to build
 2. What features are needed
 3. Design/branding preferences
+
+The LLM pipeline app (`app.py`) is a standalone utility that:
+- Accepts ZIP file uploads via a drag-and-drop web interface
+- Processes files according to the LLM Data-Type Hierarchy
+- Tier S: Raw text/code → passthrough
+- Tier A: Office docs → Markdown via pandoc
+- Tier C: Images/PDFs → OCR text extraction
+- Tier F: Binary files → ignored
+- Generates a `_manifest.md` with complete processing log
+- Returns a new ZIP optimized for LLM ingestion
 
 ## Quick Start Guide
 
