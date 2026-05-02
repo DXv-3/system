@@ -17,20 +17,14 @@ Additionally, a standalone **LLM Pre-Processing Pipeline** application has been 
 - [x] Memory bank documentation
 - [x] Recipe system for common features
 - [x] LLM Pre-Processing Pipeline (`app.py`) - ZIP to LLM-optimized converter
- - [x] System dependency validation (pandoc, tesseract, poppler)
- - [x] Input validation and error handling
- - [x] Integration testing
- - [x] Comprehensive documentation
- - [x] Full deployment with all dependencies installed
- - [x] Flask server running on port 5000
-
-## Current Focus
-
-The template and LLM pipeline are production-ready. Next steps depend on user requirements:
-
-1. What type of application to build using the Next.js template
-2. What features are needed
-3. Design/branding preferences
+  - [x] System dependency validation (pandoc, tesseract, poppler)
+  - [x] Input validation and error handling
+  - [x] Integration testing
+  - [x] Comprehensive documentation
+  - [x] Full deployment with all dependencies installed
+  - [x] Flask server running on port 5000
+  - [x] Next.js UI created at `/pipeline` route
+  - [x] lucide-react icons installed
 
 ## LLM Pipeline Overview
 
@@ -49,20 +43,36 @@ The template and LLM pipeline are production-ready. Next steps depend on user re
 - ✅ Comprehensive error handling and logging
 - ✅ Automatic cleanup of temp directories
 
-### Quick Start
+## Next.js UI (`/pipeline`)
+
+A modern frontend has been added with:
+- Drag-and-drop ZIP file upload
+- Dependency status checking
+- File size display
+- Processing state management
+- Success/error result display
+- Tier information cards
+- Connects to Flask backend at `http://localhost:5000`
+
+### To use the Next.js UI:
 
 ```bash
-# Install system dependencies
-sudo apt-get install -y pandoc tesseract-ocr poppler-utils
-
-# Install Python dependencies  
-pip install -r requirements.txt
-
-# Run the server
+# Terminal 1: Start Flask server
 python app.py
+
+# Terminal 2: Start Next.js dev server
+npm run dev
 ```
 
-Then navigate to http://localhost:5000
+Then open: http://localhost:3000/pipeline
+
+## Current Focus
+
+The template and LLM pipeline are production-ready. Next steps depend on user requirements:
+
+1. What type of application to build using the Next.js template
+2. What features are needed
+3. Design/branding preferences
 
 ## Available Recipes
 
@@ -71,8 +81,6 @@ Then navigate to http://localhost:5000
 | Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
 
 ---
-
-*Last updated: 2026-04-24*
 
 ## Quick Start Guide
 
@@ -85,45 +93,14 @@ export default function NewPage() {
 }
 ```
 
-### To add components:
+### To use the LLM Pipeline:
 
-Create `src/components/` directory and add components:
-```tsx
-// src/components/ui/Button.tsx
-export function Button({ children }: { children: React.ReactNode }) {
-  return <button className="px-4 py-2 bg-blue-600 text-white rounded">{children}</button>;
-}
-```
+1. Start Flask server: `python app.py`
+2. Open Next.js UI: http://localhost:3000/pipeline
+3. Drag and drop a ZIP file
+4. Click "Process ZIP File"
+5. Download the LLM-optimized result
 
-### To add a database:
+---
 
-Follow `.kilocode/recipes/add-database.md`
-
-### To add API routes:
-
-Create `src/app/api/[route]/route.ts`:
-```tsx
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
-
-## Available Recipes
-
-| Recipe | File | Use Case |
-|--------|------|----------|
-| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
-
-## Pending Improvements
-
-- [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
-- [ ] Add testing setup recipe
-
-## Session History
-
-| Date | Changes |
-|------|---------|
-| Initial | Template created with base setup |
+*Last updated: 2026-05-02*
