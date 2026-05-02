@@ -51,7 +51,10 @@ export default function PipelinePage() {
         document.body.removeChild(link);
       }
     } catch (error) {
-      setResult({ success: false, error: "Processing failed. Is the Flask server running on port 5000?" });
+      setResult({ 
+        success: false, 
+        error: "Processing failed. Use the Web Pipeline at /pipeline/web for browser-only processing, or start the Flask server for full features." 
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -200,9 +203,9 @@ export default function PipelinePage() {
 
         <div className="mt-12 pt-6 border-t border-neutral-800 text-center text-neutral-500 text-sm">
           <p>Requires Flask server running on port 5000</p>
-          <p className="mt-2">
+          <p className="mt-1">
             <a href="/pipeline/web" className="text-blue-400 hover:text-blue-300 underline">
-              Use Web Pipeline for browser-only processing
+              Use Web Pipeline (no server required)
             </a>
           </p>
         </div>
