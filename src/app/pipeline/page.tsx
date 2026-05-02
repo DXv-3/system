@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, Zap } from "lucide-react";
 
 interface ProcessingResult {
   success: boolean;
@@ -34,26 +34,25 @@ export default function PipelinePage() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:5000/process", {
+      const response = await fetch("/api/process", {
         method: "POST",
         body: formData,
       });
 
       const data = await response.json();
-      setResult(data);
 
-      if (data.success && data.download_url) {
-        const link = document.createElement("a");
-        link.href = `http://localhost:5000${data.download_url}`;
-        link.download = data.filename || "processed.zip";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      if (data.success) {
+        setResult(data);
+      } else {
+        setResult({
+          success: false,
+          error: "Use the Web Pipeline at /pipeline/web for browser-only processing, or start the Flask server (python app.py) for full OCR/features.",
+        });
       }
     } catch (error) {
-      setResult({ 
-        success: false, 
-        error: "Processing failed. Use the Web Pipeline at /pipeline/web for browser-only processing, or start the Flask server for full features." 
+      setResult({
+        success: false,
+        error: "Use the Web Pipeline at /pipeline/web for browser-only processing, or start the Flask server (python app.py) for full OCR/features.",
       });
     } finally {
       setIsProcessing(false);
@@ -81,6 +80,19 @@ export default function PipelinePage() {
           <p className="text-neutral-400 text-lg">
             Convert ZIP archives into LLM-optimized packages with intelligent file processing
           </p>
+        </div>
+
+        {/* Primary Web Pipeline Option */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-700/50 rounded-xl text-center">
+          <Zap className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+          <h2 className="text-xl font-semibold mb-2">Web Pipeline (Recommended)</h2>
+          <p className="text-neutral-400 mb-4">Runs entirely in your browser - no server required</p>
+          <a
+            href="/pipeline/web"
+            className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+          >
+            Use Web Pipeline
+          </a>
         </div>
 
         <div
@@ -199,15 +211,6 @@ export default function PipelinePage() {
             </h3>
             <p className="text-sm text-neutral-400">Executables, media → Excluded from output</p>
           </div>
-        </div>
-
-        <div className="mt-12 pt-6 border-t border-neutral-800 text-center text-neutral-500 text-sm">
-          <p>Requires Flask server running on port 5000</p>
-          <p className="mt-1">
-            <a href="/pipeline/web" className="text-blue-400 hover:text-blue-300 underline">
-              Use Web Pipeline (no server required)
-            </a>
-          </p>
         </div>
       </div>
     </div>
