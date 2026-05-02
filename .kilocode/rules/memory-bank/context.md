@@ -29,6 +29,10 @@ Additionally, a standalone **LLM Pre-Processing Pipeline** application has been 
 - [x] Removed duplicate `/pipeline/web-pipeline.tsx` file
 - [x] Added homepage content with call-to-action
 - [x] Promoted Web Pipeline as primary option on `/pipeline` page
+- [x] Updated Web Pipeline UI with dynamic tier counts (S/A/C/F)
+- [x] Added file preview canvas showing first 20 files
+- [x] Made download button prominent with output filename
+- [x] Added "Process another file" reset button
 
 ## LLM Pipeline Overview
 
@@ -114,3 +118,7 @@ export default function NewPage() {
 ---
 
 *Last updated: 2026-05-02*
+
+## Session History
+
+- 2026-05-02: Updated Web Pipeline UI with file preview, dynamic tier counts, and prominent download button
