@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, Download } from "lucide-react";
+import { useState, useRef } from "react";
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 interface ProcessingResult {
   success: boolean;
@@ -10,33 +10,13 @@ interface ProcessingResult {
   error?: string;
 }
 
-interface DependencyStatus {
-  status: "ok" | "missing";
-  missing: string[];
-  install_cmd?: string;
-}
-
 export default function PipelinePage() {
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<ProcessingResult | null>(null);
-  const [depsStatus, setDepsStatus] = useState<DependencyStatus | null>(null);
-  const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const checkDependencies = useCallback(async () => {
-    try {
-      const response = await fetch("http://localhost:5000/check-deps");
-      const data = await response.json();
-      setDepsStatus(data);
-      return data.status === "ok";
-    } catch (error) {
-      setDepsStatus({ status: "missing", missing: ["Server not reachable"] });
-      return false;
-    }
-  }, []);
-
-  const handleFileSelect = async (selectedFile: File) => {
+  const handleFileSelect = (selectedFile: File) => {
     if (!selectedFile.name.endsWith(".zip")) {
       setResult({ success: false, error: "Please upload a ZIP file" });
       return;
@@ -48,14 +28,7 @@ export default function PipelinePage() {
   const processFile = async () => {
     if (!file) return;
 
-    // Check dependencies first
-    const depsOk = await checkDependencies();
-    if (!depsOk || depsStatus?.status !== "ok") {
-      return;
-    }
-
     setIsProcessing(true);
-    setProgress(0);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -70,7 +43,6 @@ export default function PipelinePage() {
       setResult(data);
 
       if (data.success && data.download_url) {
-        // Trigger download
         const link = document.createElement("a");
         link.href = `http://localhost:5000${data.download_url}`;
         link.download = data.filename || "processed.zip";
@@ -99,7 +71,6 @@ export default function PipelinePage() {
   return (
     <div className="min-h-screen bg-neutral-900 text-neutral-100">
       <div className="container mx-auto px-4 py-12 max-w-3xl">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             LLM Pre-Processing Pipeline
@@ -109,25 +80,6 @@ export default function PipelinePage() {
           </p>
         </div>
 
-        {/* Dependency Status */}
-        {depsStatus && depsStatus.status === "missing" && (
-          <div className="mb-6 p-4 bg-amber-900/20 border border-amber-700 rounded-lg">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5" />
-              <div>
-                <p className="font-semibold text-amber-300 mb-1">Missing Dependencies</p>
-                <p className="text-sm text-neutral-300 mb-2">
-                  Missing: {depsStatus.missing.join(", ")}
-                </p>
-                {depsStatus.install_cmd && (
-                  <code className="text-xs bg-neutral-800 px-2 py-1 rounded">{depsStatus.install_cmd}</code>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Upload Zone */}
         <div
           className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all ${
             file ? "border-blue-500 bg-blue-500/10" : "border-neutral-700 hover:border-neutral-600"
@@ -166,7 +118,6 @@ export default function PipelinePage() {
           </div>
         </div>
 
-        {/* Processing Button */}
         {file && (
           <div className="mt-8 text-center">
             <button
@@ -189,7 +140,6 @@ export default function PipelinePage() {
           </div>
         )}
 
-        {/* Result */}
         {result && (
           <div
             className={`mt-8 p-6 rounded-xl border ${
@@ -217,7 +167,6 @@ export default function PipelinePage() {
           </div>
         )}
 
-        {/* Tier Information */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-neutral-800 rounded-xl p-6">
             <h3 className="font-semibold text-blue-400 mb-3 flex items-center gap-2">
@@ -249,9 +198,13 @@ export default function PipelinePage() {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="mt-12 pt-6 border-t border-neutral-800 text-center text-neutral-500 text-sm">
           <p>Requires Flask server running on port 5000</p>
+          <p className="mt-2">
+            <a href="/pipeline/web" className="text-blue-400 hover:text-blue-300 underline">
+              Use Web Pipeline for browser-only processing
+            </a>
+          </p>
         </div>
       </div>
     </div>

@@ -25,6 +25,10 @@ Additionally, a standalone **LLM Pre-Processing Pipeline** application has been 
   - [x] Flask server running on port 5000
   - [x] Next.js UI created at `/pipeline` route
   - [x] lucide-react icons installed
+- [x] Fixed unused imports in `/api/process/route.ts`
+- [x] Removed duplicate `/pipeline/web-pipeline.tsx` file
+- [x] Added homepage content with call-to-action
+- [x] Added link to Web Pipeline from main Pipeline page
 
 ## LLM Pipeline Overview
 
@@ -47,12 +51,18 @@ Additionally, a standalone **LLM Pre-Processing Pipeline** application has been 
 
 A modern frontend has been added with:
 - Drag-and-drop ZIP file upload
-- Dependency status checking
 - File size display
 - Processing state management
 - Success/error result display
 - Tier information cards
 - Connects to Flask backend at `http://localhost:5000`
+
+### Web Pipeline (`/pipeline/web`)
+
+Browser-only version that runs entirely in the browser:
+- No server required
+- Basic ZIP extraction and manifest generation
+- Shows file tier categorization
 
 ### To use the Next.js UI:
 
@@ -61,7 +71,7 @@ A modern frontend has been added with:
 python app.py
 
 # Terminal 2: Start Next.js dev server
-npm run dev
+bun run dev
 ```
 
 Then open: http://localhost:3000/pipeline
