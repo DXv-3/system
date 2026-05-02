@@ -28,7 +28,7 @@ Additionally, a standalone **LLM Pre-Processing Pipeline** application has been 
 - [x] Fixed unused imports in `/api/process/route.ts`
 - [x] Removed duplicate `/pipeline/web-pipeline.tsx` file
 - [x] Added homepage content with call-to-action
-- [x] Added link to Web Pipeline from main Pipeline page
+- [x] Promoted Web Pipeline as primary option on `/pipeline` page
 
 ## LLM Pipeline Overview
 
