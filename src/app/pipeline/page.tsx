@@ -155,64 +155,33 @@ export default function PipelinePage() {
           </div>
         )}
 
-        {result && (
-          <div
-            className={`mt-8 p-6 rounded-xl border ${
-              result.success ? "bg-green-900/20 border-green-700" : "bg-red-900/20 border-red-700"
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              {result.success ? (
-                <CheckCircle className="w-6 h-6 text-green-400 mt-0.5" />
-              ) : (
-                <AlertCircle className="w-6 h-6 text-red-400 mt-0.5" />
-              )}
-              <div>
-                <p className={`font-semibold text-lg ${result.success ? "text-green-300" : "text-red-300"}`}>
-                  {result.success ? "Processing Complete!" : "Error"}
-                </p>
-                {result.error && <p className="text-neutral-300 mt-1">{result.error}</p>}
-                {result.success && result.filename && (
-                  <p className="text-neutral-400 text-sm mt-2">
-                    Output: {result.filename}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-neutral-800 rounded-xl p-6">
-            <h3 className="font-semibold text-blue-400 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-              Tier S - Passthrough
-            </h3>
-            <p className="text-sm text-neutral-400">Raw text/code/JSON/YAML → Copied as-is</p>
-          </div>
-          <div className="bg-neutral-800 rounded-xl p-6">
-            <h3 className="font-semibold text-cyan-400 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
-              Tier A - To Markdown
-            </h3>
-            <p className="text-sm text-neutral-400">DOCX, PPTX, XLSX → Converted to Markdown</p>
-          </div>
-          <div className="bg-neutral-800 rounded-xl p-6">
-            <h3 className="font-semibold text-amber-400 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
-              Tier C - OCR Extraction
-            </h3>
-            <p className="text-sm text-neutral-400">Images, PDFs → Text extracted via OCR</p>
-          </div>
-          <div className="bg-neutral-800 rounded-xl p-6">
-            <h3 className="font-semibold text-neutral-500 mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-neutral-500 rounded-full"></span>
-              Tier F - Ignored
-            </h3>
-            <p className="text-sm text-neutral-400">Executables, media → Excluded from output</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+{result && (
+           <div
+             className={`mt-8 p-6 rounded-xl border ${
+               result.success ? "bg-green-900/20 border-green-700" : "bg-red-900/20 border-red-700"
+             }`}
+           >
+             <div className="flex items-start gap-3">
+               {result.success ? (
+                 <CheckCircle className="w-6 h-6 text-green-400 mt-0.5" />
+               ) : (
+                 <AlertCircle className="w-6 h-6 text-red-400 mt-0.5" />
+               )}
+               <div>
+                 <p className={`font-semibold text-lg ${result.success ? "text-green-300" : "text-red-300"}`}>
+                   {result.success ? "Processing Complete!" : "Error"}
+                 </p>
+                 {result.error && <p className="text-neutral-300 mt-1">{result.error}</p>}
+                 {result.success && result.filename && (
+                   <p className="text-neutral-400 text-sm mt-2">
+                     Output: {result.filename}
+                   </p>
+                 )}
+               </div>
+             </div>
+           </div>
+         )}
+       </div>
+     </div>
+   );
 }

@@ -33,6 +33,8 @@ Additionally, a standalone **LLM Pre-Processing Pipeline** application has been 
 - [x] Added file preview canvas showing first 20 files
 - [x] Made download button prominent with output filename
 - [x] Added "Process another file" reset button
+- [x] Removed non-functional tier info boxes from `/pipeline` page
+- [x] Enhanced homepage with tier information cards
 
 ## LLM Pipeline Overview
 
@@ -122,3 +124,4 @@ export default function NewPage() {
 ## Session History
 
 - 2026-05-02: Updated Web Pipeline UI with file preview, dynamic tier counts, and prominent download button
+- 2026-05-09: Removed non-functional tier info boxes from `/pipeline` page, enhanced homepage with tier info cards
